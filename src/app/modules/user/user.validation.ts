@@ -1,15 +1,26 @@
 import { z } from "zod";
 
-
-
 const UserCreateValidation = z.object({
     body:z.object({
-        name:z.string().nonempty(),
+       userName:z.string().nonempty(),
         email:z.string().email(),
         password:z.string().nonempty(),
-        phone:z.string().nonempty(),
-        address:z.string().nonempty(),
-        // role:z.enum(['admin','user'])
+        profileImage:z.string().optional(),
+        role:z.enum(['admin','user']).default('user'),
+        address:z.string().optional(),
+        memberShip:z.enum(['free','premium']).default('free').optional()
+    })
+})
+
+const UserUpdateValidation = z.object({
+    body:z.object({
+        userName:z.string().nonempty().optional(),
+        email:z.string().email().optional(),
+        password:z.string().nonempty().optional(),
+        profileImage:z.string().optional(),
+        role:z.enum(['admin','user']).optional(),
+        address:z.string().optional(),
+        memberShip:z.enum(['free','premium']).optional()
     })
 })
 
@@ -24,5 +35,6 @@ const UserLoginValidation = z.object({
 
 export const UserValidation={
     UserCreateValidation,
+    UserUpdateValidation,
     UserLoginValidation
 }

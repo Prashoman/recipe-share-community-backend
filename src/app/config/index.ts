@@ -10,5 +10,8 @@ export default{
     jwt_refresh_token_secret: process.env.jWT_REFRESH_TOKEN_SECRET,
     jwt_token_expiry: process.env.JWT_EXPIRES_TOKEN,
     jwt_refresh_token_expiry: process.env.JWT_REFRESH_TOKEN_EXPIRES,
-    salts_rounds: process.env.BCRYPT_SALT_ROUNDS
+    salts_rounds: process.env.BCRYPT_SALT_ROUNDS,
+    cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
+    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET
 }

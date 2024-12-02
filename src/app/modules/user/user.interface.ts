@@ -1,11 +1,13 @@
 
 export type TUser = {
-    name: string;
+    userName: string;
     email: string;
     password: string;
-    phone: string;
     role: 'admin' | 'user';
+    profileImage?: string;
     address: string;
+    memberShip: 'free' | 'premium';
+    isDeleted: boolean;
 }
 
 

@@ -5,8 +5,11 @@ import sendResponse from "../../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const userSignUp = catchAsyn(async (req: Request, res: Response) => {
+  const userImage = req.file;
   const userInfo = req.body;
-  const insertedUser = await UserService.signUpIntoDB(userInfo);
+  // console.log({userImage,userInfo});
+
+  const insertedUser = await UserService.signUpIntoDB(userImage, userInfo);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -27,9 +30,8 @@ const getAllUsers = catchAsyn(async (req: Request, res: Response) => {
 
 const userLogin = catchAsyn(async (req: Request, res: Response) => {
   const userCredentials = req.body;
-  const { userWithOutPassword, accessToken, refreshToken } = await UserService.useLoginFromDB(
-    userCredentials
-  );
+  const { userWithOutPassword, accessToken, refreshToken } =
+    await UserService.useLoginFromDB(userCredentials);
   if (accessToken && refreshToken) {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -40,7 +42,7 @@ const userLogin = catchAsyn(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     token: accessToken,
-    data:userWithOutPassword,
+    data: userWithOutPassword,
     message: "User logged in successfully",
   });
 });
@@ -56,7 +58,7 @@ const createAdmin = catchAsyn(async (req: Request, res: Response) => {
   });
 });
 
-const getAllAdmin = catchAsyn(async(req: Request, res: Response) => {
+const getAllAdmin = catchAsyn(async (req: Request, res: Response) => {
   const admins = await UserService.getAllAdminIntoDB();
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -71,5 +73,5 @@ export const UserController = {
   getAllUsers,
   userLogin,
   createAdmin,
-  getAllAdmin
+  getAllAdmin,
 };
