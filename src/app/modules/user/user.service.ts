@@ -15,7 +15,7 @@ const signUpIntoDB = async (payload: TUser) => {
   }
   payload.role = "user";
 
-  console.log(payload);
+  // console.log(payload);
   const result = await User.create(payload);
   return result;
 };
@@ -37,11 +37,17 @@ const createAdminIntoDB = async (payload: TUser) => {
 
 const useLoginFromDB = async (payload: TUserLogin) => {
   const { email, password } = payload;
-  const user = await User.findOne({ email },{isDeleted:false}).select("+password");
+  console.log({ email, password });
+  
+  const user = await User.findOne({ email, isDeleted: false }).select("+password");
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "Email Not Found");
   }
+  console.log({ user });
+  
   const isMatch = await bcrypt.compare(password, user.password);
+  console.log({ isMatch });
+  
   if (!isMatch) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Password dose not match");
   }
@@ -76,7 +82,7 @@ const changePasswordIntoDB = async (
   oldPassword: string,
   newPassword: string
 ) => {
-  const userWithPassword = await User.findById(user.id,{ isDeleted:false }).select("+password");
+  const userWithPassword = await User.findOne({ _id: user.id, isDeleted: false }).select("+password");
   if (!userWithPassword) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -96,7 +102,7 @@ const changePasswordIntoDB = async (
 };
 
 const updateProfileIntoDB = async (user: any, userInfo: TUser) => {
-  const matchUser = await User.findById({ _id: user.id, isDeleted: false });
+  const matchUser = await User.findOne({ _id: user.id, isDeleted: false });
   if (!matchUser) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -139,7 +145,7 @@ const resetPasswordIntoDB = async (
   token: string,
   newPassword: string
 ) => {
-  const user = await User.findById({ _id: id, isDeleted: false });
+  const user = await User.findOne({ _id: id, isDeleted: false });
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");

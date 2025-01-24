@@ -33,7 +33,7 @@ This is the backend service for the Recipe Share Community Platform application.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/
+   git clone https://github.com/Prashoman/recipe-share-community-backend/
    ```
 2. Navigate to the project directory:
    ```bash
@@ -310,6 +310,123 @@ This API provides functionality to manage users, including creating, fetching, u
     "data": {
       // updated user data
     }
+  }
+  ```
+
+## Error Handling
+
+Errors are handled globally by the `globalErrorHandler` middleware. The error response structure is as follows:
+
+## Global Error Response
+
+```json
+{
+  "success": false,
+  "message": "string",
+  "errorSources": [
+    {
+      "path": "string",
+      "message": "string"
+    }
+  ],
+  "stack": "string (only in development)"
+}
+```
+
+## Setup and Usage
+
+Follow the steps in the [Getting Started](#getting-started) section of the main README to set up and run the application.
+
+# User Relationship API Documentation
+
+This API provides functionality to manage user relationships, including following, unfollowing, and retrieving followers and following users.
+
+## Table of Contents
+
+- [Endpoints](#endpoints)
+  - [Follow User](#follow-user)
+  - [Unfollow User](#unfollow-user)
+  - [Get Followers](#get-followers)
+  - [Get Following](#get-following)
+- [Error Handling](#error-handling)
+- [Global Error Response](#global-error-response)
+- [Setup and Usage](#setup-and-usage)
+
+## Endpoints
+
+### Follow User
+
+- **URL:** `/api/user/follow`
+- **Method:** `POST`
+- **Description:** Follows a user.
+- **Request Body:**
+  ```json
+  {
+    "followId": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "User followed successfully",
+    "data": {
+      // follow user info
+    }
+  }
+  ```
+
+### Unfollow User
+
+- **URL:** `/api/user/un-follow`
+- **Method:** `POST`
+- **Description:** Unfollows a user.
+- **Request Body:**
+  ```json
+  {
+    "unFollowId": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "User unfollowed successfully",
+    "data": {
+      // unfollow user info
+    }
+  }
+  ```
+
+### Get Followers
+
+- **URL:** `/api/user/followers`
+- **Method:** `GET`
+- **Description:** Retrieves the followers of the logged-in user.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Followers fetched successfully",
+    "data": [
+      // array of follower data
+    ]
+  }
+  ```
+
+### Get Following
+
+- **URL:** `/api/user/following`
+- **Method:** `GET`
+- **Description:** Retrieves the users followed by the logged-in user.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Following fetched successfully",
+    "data": [
+      // array of following data
+    ]
   }
   ```
 
