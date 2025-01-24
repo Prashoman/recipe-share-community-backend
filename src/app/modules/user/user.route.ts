@@ -4,20 +4,13 @@ import { validationMiddleware } from "../../middleware/Validation.Middelware";
 import { UserValidation } from "./user.validation";
 import auth from "../../middleware/auth";
 
-import { multerUpload } from "../../config/multer.config";
 
 const route = express.Router();
 
-route.get("/users", UserController.getAllUsers);
+route.get("/users", auth("admin"), UserController.getAllUsers);
 
 route.post(
   "/signup",
-  multerUpload.single("profileImage"),
-  (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.body);
-    req.body = JSON.parse(req.body.data);
-    next();
-  },
   validationMiddleware(UserValidation.UserCreateValidation),
   UserController.userSignUp
 );
@@ -36,4 +29,15 @@ route.post(
   validationMiddleware(UserValidation.UserLoginValidation),
   UserController.userLogin
 );
+
+route.post("/change-password", auth("admin","user"), UserController.changePassword);
+
+route.put("/update-profile", auth("admin","user"), UserController.updateProfile);
+
+route.get("/profile", auth("admin","user"), UserController.getProfile);
+
+route.post("/forget-password", UserController.forgetPassword);
+
+route.post("/reset-password", UserController.resetPassword);
+
 export const UserRoute = route;

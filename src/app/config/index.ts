@@ -13,5 +13,7 @@ export default{
     salts_rounds: process.env.BCRYPT_SALT_ROUNDS,
     cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
-    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET
+    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
+    fronted_url: process.env.FRONTEND_URL,
+    smtpPassword: process.env.SMTP_PASS,
 }

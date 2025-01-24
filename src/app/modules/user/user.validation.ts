@@ -8,7 +8,7 @@ const UserCreateValidation = z.object({
         profileImage:z.string().optional(),
         role:z.enum(['admin','user']).default('user'),
         address:z.string().optional(),
-        memberShip:z.enum(['free','premium']).default('free').optional()
+        memberShip:z.enum(['free','premium']).default('free').optional(),
     })
 })
 

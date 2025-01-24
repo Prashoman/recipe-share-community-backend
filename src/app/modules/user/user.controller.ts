@@ -5,11 +5,9 @@ import sendResponse from "../../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const userSignUp = catchAsyn(async (req: Request, res: Response) => {
-  const userImage = req.file;
   const userInfo = req.body;
-  // console.log({userImage,userInfo});
 
-  const insertedUser = await UserService.signUpIntoDB(userImage, userInfo);
+  const insertedUser = await UserService.signUpIntoDB(userInfo);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -68,10 +66,79 @@ const getAllAdmin = catchAsyn(async (req: Request, res: Response) => {
   });
 });
 
+const changePassword = catchAsyn(async (req: Request, res: Response) => {
+  const { oldPassword, newPassword } = req.body;
+  const user = req.user;
+  console.log({ user });
+
+  const updatedUser = await UserService.changePasswordIntoDB(
+    user,
+    oldPassword,
+    newPassword
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: updatedUser,
+    message: "Password changed successfully",
+  });
+});
+
+const updateProfile = catchAsyn(async (req: Request, res: Response) => {
+  const userInfo = req.body;
+  const user = req.user;
+  const updatedUser = await UserService.updateProfileIntoDB(user, userInfo);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: updatedUser,
+    message: "Profile updated successfully",
+  });
+});
+
+const getProfile = catchAsyn(async (req: Request, res: Response) => {
+  const user = req.user;
+  const myProfile = await UserService.getProfileFromDB(user);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: myProfile,
+    message: "Profile fetched successfully",
+  });
+});
+
+const forgetPassword = catchAsyn(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const result = await UserService.forgetPasswordIntoDB(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: result,
+    message: "Password reset link sent to your email",
+  });
+});
+
+const resetPassword = catchAsyn(async (req: Request, res: Response) => {
+  const { id, newPassword } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
+  const result = await UserService.resetPasswordIntoDB(id, token!, newPassword);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: result,
+    message: "Password reset successfully",
+  });
+});
+
 export const UserController = {
   userSignUp,
   getAllUsers,
   userLogin,
   createAdmin,
   getAllAdmin,
+  changePassword,
+  updateProfile,
+  getProfile,
+  forgetPassword,
+  resetPassword,
 };

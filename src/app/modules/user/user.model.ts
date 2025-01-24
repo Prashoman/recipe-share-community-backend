@@ -16,12 +16,15 @@ const userSchema = new Schema<TUser>(
       default: "user",
     },
     address: { type: String, required: false },
+    bio: { type: String, required: false },
     memberShip: {
       type: String,
       required: true,
       enum: ["free", "premium"],
       default: "free",
     },
+    expiryDate: { type: Date, required: false },
+    passwordUpdate: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
   },
   {

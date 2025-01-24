@@ -6,23 +6,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../../config";
 import createToken from "../../../utils/createToken";
-import { sendImageToCloudinary } from "../../../utils/uploadImageToCloudinary";
+import { sendEmail } from "./user.constant";
 
-const signUpIntoDB = async (userImage: any, payload: TUser) => {
+const signUpIntoDB = async (payload: TUser) => {
   const existEmail = await User.findOne({ email: payload.email });
   if (existEmail) {
     throw new AppError(httpStatus.FORBIDDEN, "Email already exist");
   }
-
-  //   const imagePath = userImage ? userImage?.path : null;
-  //   const imageName = `${payload?.userName}-${Date.now()}`;
-  //   console.log({imagePath,imageName});
-
-  //  const {secure_url}= await sendImageToCloudinary(imageName,imagePath);
-
-  //  console.log({secure_url});
-
-  payload.profileImage = userImage?.path;
+  payload.role = "user";
 
   console.log(payload);
   const result = await User.create(payload);
@@ -46,7 +37,7 @@ const createAdminIntoDB = async (payload: TUser) => {
 
 const useLoginFromDB = async (payload: TUserLogin) => {
   const { email, password } = payload;
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email },{isDeleted:false}).select("+password");
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "Email Not Found");
   }
@@ -80,10 +71,112 @@ const getAllAdminIntoDB = async () => {
   return result;
 };
 
+const changePasswordIntoDB = async (
+  user: any,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const userWithPassword = await User.findById(user.id,{ isDeleted:false }).select("+password");
+  if (!userWithPassword) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const isMatch = await bcrypt.compare(oldPassword, userWithPassword.password);
+  if (!isMatch) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Password dose not match");
+  }
+  const newPasswordHash = await bcrypt.hash(
+    newPassword,
+    Number(config.salts_rounds)
+  );
+  const updatePassword = await User.findByIdAndUpdate(user.id, {
+    password: newPasswordHash,
+    passwordUpdate: true,
+  });
+  return updatePassword;
+};
+
+const updateProfileIntoDB = async (user: any, userInfo: TUser) => {
+  const matchUser = await User.findById({ _id: user.id, isDeleted: false });
+  if (!matchUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const updatedUser = await User.findByIdAndUpdate({ _id: user.id }, userInfo, {
+    new: true,
+  });
+  return updatedUser;
+};
+
+const getProfileFromDB = async (user: any) => {
+  const matchUser = await User.findById({ _id: user.id, isDeleted: false });
+  if (!matchUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  return matchUser;
+};
+
+const forgetPasswordIntoDB = async (email: string) => {
+  const user = await User.findOne({ email, isDeleted: false });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const jwtPayload = { id: user._id, userRole: user.role };
+  const token = createToken(
+    jwtPayload,
+    config.jwt_token_secret as string,
+    "5m"
+  );
+  const link = `${config.fronted_url}/reset-password?id=${user?._id}&token=${token}`;
+  sendEmail(
+    email,
+    " Change Your Password with 5 Minutes ",
+    "<b>Click the link to change password</b>" + link
+  );
+  return link;
+};
+
+const resetPasswordIntoDB = async (
+  id: string,
+  token: string,
+  newPassword: string
+) => {
+  const user = await User.findById({ _id: id, isDeleted: false });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  const jwtPayload: any = jwt.verify(token, config.jwt_token_secret as string);
+  // console.log({ jwtPayload, user });
+  
+  if (jwtPayload.id != user._id) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "User not authorized");
+  }
+
+  const newPasswordHash = await bcrypt.hash(
+    newPassword,
+    Number(config.salts_rounds)
+  );
+  const updatePassword = await User.findByIdAndUpdate(
+    {
+      _id: user._id,
+    },
+    {
+      password: newPasswordHash,
+      passwordUpdate: true,
+    }
+  );
+  return updatePassword;
+};
+
 export const UserService = {
   signUpIntoDB,
   getAllUsersFormDB,
   useLoginFromDB,
   createAdminIntoDB,
   getAllAdminIntoDB,
+  changePasswordIntoDB,
+  updateProfileIntoDB,
+  getProfileFromDB,
+  forgetPasswordIntoDB,
+  resetPasswordIntoDB,
 };
+// http://localhost:3000/reset-password?id=67926cf7dfd7c8f43b1d9d54&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTI2Y2Y3ZGZkN2M4ZjQzYjFkOWQ1NCIsInVzZXJSb2xlIjoidXNlciIsImlhdCI6MTczNzY5ODAzMywiZXhwIjoxNzM3Njk4MzMzfQ.jDUicc8ek6p1i0RAGcZkL6Ps1NdLTeDXP3-j3hVnIPc"
