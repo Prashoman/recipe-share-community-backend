@@ -450,10 +450,339 @@ Errors are handled globally by the `globalErrorHandler` middleware. The error re
 }
 ```
 
+# Recipe API Documentation
 
+This API provides functionality to manage recipes, including creating, fetching, updating, and deleting recipes.
 
+## Table of Contents
 
+- [Endpoints](#endpoints)
+  - [Create Recipe](#create-recipe)
+  - [Get All Admin Recipes](#get-all-admin-recipes)
+  - [Get All User Recipes](#get-all-user-recipes)
+  - [Update Public Recipe](#update-public-recipe)
+  - [Delete Recipe](#delete-recipe)
+  - [Update Recipe](#update-recipe)
+- [Error Handling](#error-handling)
+- [Global Error Response](#global-error-response)
+- [Setup and Usage](#setup-and-usage)
+
+## Endpoints
+
+### Create Recipe
+
+- **URL:** `/api/recipe/create`
+- **Method:** `POST`
+- **Description:** Creates a new recipe.
+- **Request Body:**
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "image": "string",
+    "ingredients": ["string"],
+    "cookingTime": "number",
+    "category": "string",
+    "tags": ["string"]
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Recipe created successfully",
+    "data": {
+      // recipe data
+    }
+  }
+  ```
+
+### Get All Admin Recipes
+
+- **URL:** `/api/recipe/all`
+- **Method:** `GET`
+- **Description:** Retrieves all recipes for admin. Requires admin authentication.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "All recipes fetched successfully",
+    "data": [
+      // array of recipe data
+    ]
+  }
+  ```
+
+### Get All User Recipes
+
+- **URL:** `/api/recipe/my-recipes`
+- **Method:** `GET`
+- **Description:** Retrieves all recipes for the logged-in user.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "All recipes fetched successfully",
+    "data": [
+      // array of recipe data
+    ]
+  }
+  ```
+
+### Update Public Recipe
+
+- **URL:** `/api/recipe/publish/:id`
+- **Method:** `PUT`
+- **Description:** Updates a recipe to be public.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Recipe Public successfully",
+    "data": {
+      // updated recipe data
+    }
+  }
+  ```
+
+### Delete Recipe
+
+- **URL:** `/api/recipe/delete/:id`
+- **Method:** `DELETE`
+- **Description:** Deletes a recipe.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Recipe deleted successfully",
+    "data": {
+      // deleted recipe data
+    }
+  }
+  ```
+
+### Update Recipe
+
+- **URL:** `/api/recipe/update/:id`
+- **Method:** `PUT`
+- **Description:** Updates a recipe.
+- **Request Body:**
+  ```json
+  {
+    "title": "string (optional)",
+    "description": "string (optional)",
+    "image": "string (optional)",
+    "ingredients": ["string"] (optional),
+    "cookingTime": "number (optional)",
+    "category": "string (optional)",
+    "tags": ["string"] (optional)
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Recipe updated successfully",
+    "data": {
+      // updated recipe data
+    }
+  }
+  ```
+
+## Error Handling
+
+Errors are handled globally by the `globalErrorHandler` middleware. The error response structure is as follows:
+
+## Global Error Response
+
+```json
+{
+  "success": false,
+  "message": "string",
+  "errorSources": [
+    {
+      "path": "string",
+      "message": "string"
+    }
+  ],
+  "stack": "string (only in development)"
+}
+```
+
+# Likes API Documentation
+
+This API provides functionality to manage likes, including creating, deleting, and retrieving likes.
+
+## Table of Contents
+
+- [Endpoints](#endpoints)
+  - [Create Like](#create-like)
+  - [Delete Like](#delete-like)
+  - [Get Likes](#get-likes)
+- [Error Handling](#error-handling)
+- [Global Error Response](#global-error-response)
+- [Setup and Usage](#setup-and-usage)
+
+## Endpoints
+
+### Create Like
+
+- **URL:** `/api/like/create`
+- **Method:** `POST`
+- **Description:** Creates a new like for a recipe.
+- **Request Body:**
+  ```json
+  {
+    "recipeId": "string"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Like created successfully",
+    "data": {
+      // like data
+    }
+  }
+  ```
+
+### Delete Like
+
+- **URL:** `/api/like/delete/:id`
+- **Method:** `DELETE`
+- **Description:** Deletes a like for a recipe.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Like deleted successfully",
+    "data": {
+      // deleted like data
+    }
+  }
+  ```
+
+### Get Likes
+
+- **URL:** `/api/like/get`
+- **Method:** `GET`
+- **Description:** Retrieves all likes for the logged-in user.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Likes fetched successfully",
+    "data": [
+      // array of like data
+    ]
+  }
+  ```
+
+## Error Handling
+
+Errors are handled globally by the `globalErrorHandler` middleware. The error response structure is as follows:
+
+## Global Error Response
+
+```json
+{
+  "success": false,
+  "message": "string",
+  "errorSources": [
+    {
+      "path": "string",
+      "message": "string"
+    }
+  ],
+  "stack": "string (only in development)"
+}
+```
 
 ## Setup and Usage
 
 Follow the steps in the [Getting Started](#getting-started) section of the main README to set up and run the application.
+
+# Ratings API Documentation
+
+This API provides functionality to manage ratings, including creating and retrieving ratings.
+
+## Table of Contents
+
+- [Endpoints](#endpoints)
+  - [Create Rating](#create-rating)
+  - [Get My Ratings](#get-my-ratings)
+- [Error Handling](#error-handling)
+- [Global Error Response](#global-error-response)
+- [Setup and Usage](#setup-and-usage)
+
+## Endpoints
+
+### Create Rating
+
+- **URL:** `/api/rating/create`
+- **Method:** `POST`
+- **Description:** Creates a new rating for a recipe.
+- **Request Body:**
+  ```json
+  {
+    "recipe": "string",
+    "rating": "number"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Rating created successfully",
+    "data": {
+      // rating data
+    }
+  }
+  ```
+
+### Get My Ratings
+
+- **URL:** `/api/rating/get-my-rating`
+- **Method:** `GET`
+- **Description:** Retrieves all ratings for the logged-in user.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "My ratings",
+    "data": [
+      // array of rating data
+    ]
+  }
+  ```
+
+## Error Handling
+
+Errors are handled globally by the `globalErrorHandler` middleware. The error response structure is as follows:
+
+## Global Error Response
+
+```json
+{
+  "success": false,
+  "message": "string",
+  "errorSources": [
+    {
+      "path": "string",
+      "message": "string"
+    }
+  ],
+  "stack": "string (only in development)"
+}
+```
+
+## Setup and Usage
+
+Follow the steps in the [Getting Started](#getting-started) section of the main README to set up and run the application.
+
+
+
+
+
+
