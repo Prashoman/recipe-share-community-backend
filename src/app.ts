@@ -4,7 +4,7 @@ import router from "./app/router/router";
 import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/notFound";
 const app: Application = express();
-app.use(cors({ origin: "http://localhost:5173" , credentials :  true}));
+app.use(cors({ origin: "http://localhost:3000" , credentials :  true}));
 app.use(express.json());
 
 app.use("/api", router);
