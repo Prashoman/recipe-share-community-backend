@@ -37,16 +37,16 @@ const createAdminIntoDB = async (payload: TUser) => {
 
 const useLoginFromDB = async (payload: TUserLogin) => {
   const { email, password } = payload;
-  console.log({ email, password });
+  // console.log({ email, password });
   
   const user = await User.findOne({ email, isDeleted: false }).select("+password");
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "Email Not Found");
   }
-  console.log({ user });
+  // console.log({ user });
   
   const isMatch = await bcrypt.compare(password, user.password);
-  console.log({ isMatch });
+  // console.log({ isMatch });
   
   if (!isMatch) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Password dose not match");

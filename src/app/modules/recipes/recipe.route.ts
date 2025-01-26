@@ -21,4 +21,9 @@ route.delete("/delete/:id", auth("admin","user"), RecipeController.deleteRecipe)
 
 route.put("/update/:id", auth("admin","user"), RecipeController.updateRecipe);
 
+route.get("/get-all/public", RecipeController.getAllPublicRecipes);
+route.get("/details/:id", RecipeController.getSingleRecipesById);
+
+
+
 export const RecipeRouter = route;

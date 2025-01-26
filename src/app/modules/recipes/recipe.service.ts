@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../../error/AppError";
 import { User } from "../user/user.model";
 import { Recipe } from "./recipe.model";
+import mongoose from "mongoose";
 
 const createRecipeIntoDB = async (recipe: any, user: any) => {
   const matchUser = await User.findById(user.id, { isDeleted: false });
@@ -69,6 +70,85 @@ const updateRecipeIntoDB = async (recipeId: any, recipe: any, user: any) => {
   return result;
 };
 
+const getAllPublicRecipesFromDB = async () => {
+  try {
+    const recipesWithRatings = await Recipe.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          isPublished: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "ratings", // Reference the ratings collection
+          localField: "_id", // Match the recipe _id in recipes
+          foreignField: "recipe", // Match the recipe field in ratings
+          as: "ratings", // Include all ratings for the recipe
+        },
+      },
+      {
+        $addFields: {
+          averageRating: { $avg: "$ratings.rating" },
+        },
+      },
+      {
+        $project: {
+          ratings: 0,
+        },
+      },
+    ]);
+
+    return recipesWithRatings;
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+};
+
+
+
+const getSingleRecipeByIdFromDB = async (recipeId: any) => {
+  try {
+    const getSingleRecipeWithRatings = await Recipe.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(recipeId),
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "ratings",
+          localField: "_id",
+          foreignField: "recipe",
+          as: "ratings",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: { $avg: "$ratings.rating" },
+        },
+      },
+      {
+        $project: {
+          ratings: 0,
+        },
+      },
+    ]);
+    // console.log({getSingleRecipeWithRatings});
+    
+    return getSingleRecipeWithRatings;
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+};
+
 export const RecipeService = {
   createRecipeIntoDB,
   getAllRecipesAdminFromDB,
@@ -76,4 +156,6 @@ export const RecipeService = {
   updatePublicRecipeIntoDB,
   deleteRecipeIntoDB,
   updateRecipeIntoDB,
+  getAllPublicRecipesFromDB,
+  getSingleRecipeByIdFromDB
 };

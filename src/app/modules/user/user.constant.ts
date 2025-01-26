@@ -3,7 +3,7 @@ import config from "../../config";
 
 
 export const sendEmail = async (email: string, subject: string, text: string) => {
-    console.log({text});
+    // console.log({text});
     
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",

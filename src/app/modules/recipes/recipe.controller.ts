@@ -47,7 +47,6 @@ const updatePublicRecipe = catchAsyn(async (req, res) => {
   });
 });
 
-
 const deleteRecipe = catchAsyn(async (req, res) => {
   const recipeId = req.params.id;
   const recipe = await RecipeService.deleteRecipeIntoDB(recipeId);
@@ -63,18 +62,39 @@ const updateRecipe = catchAsyn(async (req, res) => {
   const recipeId = req.params.id;
   const recipeInfo = req.body;
   const user = req.user;
-  const recipe = await RecipeService.updateRecipeIntoDB(recipeId, recipeInfo,user);
+  const recipe = await RecipeService.updateRecipeIntoDB(
+    recipeId,
+    recipeInfo,
+    user
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     data: recipe,
     message: "Recipe updated successfully",
   });
-}
-);
+});
 
+const getAllPublicRecipes = catchAsyn(async (req, res) => {
+  const recipes = await RecipeService.getAllPublicRecipesFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipes,
+    message: "All public recipes fetched successfully",
+  });
+});
 
-
+const getSingleRecipesById = catchAsyn(async (req, res) => {
+  const recipeId = req.params.id;
+  const recipe = await RecipeService.getSingleRecipeByIdFromDB(recipeId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipe,
+    message: "Recipe fetched successfully",
+  });
+});
 
 export const RecipeController = {
   createRecipe,
@@ -83,4 +103,6 @@ export const RecipeController = {
   updatePublicRecipe,
   deleteRecipe,
   updateRecipe,
+  getAllPublicRecipes,
+  getSingleRecipesById,
 };
