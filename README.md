@@ -450,6 +450,10 @@ Errors are handled globally by the `globalErrorHandler` middleware. The error re
 }
 ```
 
+
+
+
+
 ## Setup and Usage
 
 Follow the steps in the [Getting Started](#getting-started) section of the main README to set up and run the application.
