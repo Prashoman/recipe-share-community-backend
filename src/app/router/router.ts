@@ -4,6 +4,7 @@ import { UserRelationShip } from "../modules/userRelationShip/userRelationShip.r
 import { RecipeRouter } from "../modules/recipes/recipe.route";
 import { LikeRoute } from "../modules/likes/like.route";
 import { RatingRoute } from "../modules/ratings/rating.route";
+import { CommentRoute } from "../modules/commets/comment.route";
 
 const router = Router();
 const modulerRoute = [
@@ -26,6 +27,10 @@ const modulerRoute = [
   {
     path:"/rating",
     route: RatingRoute
+  },
+  {
+    path:"/comment",
+    route: CommentRoute
   }
 ];
 

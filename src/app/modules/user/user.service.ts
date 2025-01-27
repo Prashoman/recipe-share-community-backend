@@ -13,6 +13,8 @@ const signUpIntoDB = async (payload: TUser) => {
   if (existEmail) {
     throw new AppError(httpStatus.FORBIDDEN, "Email already exist");
   }
+  payload.bio="";
+  payload.address="";
   payload.role = "user";
 
   // console.log(payload);

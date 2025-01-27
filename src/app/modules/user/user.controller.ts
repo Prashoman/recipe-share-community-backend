@@ -6,6 +6,8 @@ import httpStatus from "http-status";
 
 const userSignUp = catchAsyn(async (req: Request, res: Response) => {
   const userInfo = req.body;
+  console.log({ userInfo });
+  
 
   const insertedUser = await UserService.signUpIntoDB(userInfo);
   sendResponse(res, {
