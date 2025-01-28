@@ -38,12 +38,13 @@ const getAllUserRecipes = catchAsyn(async (req, res) => {
 
 const updatePublicRecipe = catchAsyn(async (req, res) => {
   const recipeId = req.params.id;
+  const info = req.body;
   const recipe = await RecipeService.updatePublicRecipeIntoDB(recipeId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     data: recipe,
-    message: "Recipe Public successfully",
+    message: recipe?.isPublished ? "Recipe published" : "Recipe unpublished",
   });
 });
 
