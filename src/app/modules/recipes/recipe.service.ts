@@ -39,7 +39,7 @@ const updatePublicRecipeIntoDB = async (recipeId: any) => {
   }
   const recipeStatus = await Recipe.findByIdAndUpdate(
     recipeId,
-    { isPublished: true },
+    { isPublished: !recipe.isPublished },
     { new: true }
   );
   return recipeStatus;

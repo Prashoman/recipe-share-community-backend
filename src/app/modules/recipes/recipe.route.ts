@@ -15,7 +15,7 @@ route.get("/all", auth("admin"), RecipeController.getAllAdminRecipes);
 // todo list here my recipes only view user
 route.get("/my-recipes", auth("user","admin"), RecipeController.getAllUserRecipes);
 
-route.put("/publish/:id", auth("admin"), RecipeController.updatePublicRecipe);
+route.put("/publish/", auth("admin"), RecipeController.updatePublicRecipe);
 
 route.delete("/delete/:id", auth("admin","user"), RecipeController.deleteRecipe);
 
