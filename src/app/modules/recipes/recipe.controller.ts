@@ -37,7 +37,7 @@ const getAllUserRecipes = catchAsyn(async (req, res) => {
 });
 
 const updatePublicRecipe = catchAsyn(async (req, res) => {
-  const recipeId = req.body;
+  const recipeId = req.body.id;
   const recipe = await RecipeService.updatePublicRecipeIntoDB(recipeId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
