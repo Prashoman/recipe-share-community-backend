@@ -97,6 +97,11 @@ const getAllPublicRecipesFromDB = async () => {
           ratings: 0,
         },
       },
+      {
+        $sort: {
+          likes: -1,
+        },
+      }
     ]);
 
     return recipesWithRatings;

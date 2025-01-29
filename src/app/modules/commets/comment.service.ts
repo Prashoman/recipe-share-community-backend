@@ -30,7 +30,11 @@ const getAllCommentsFromDB = async (userId: string) => {
 };
 
 const getCommentByRecipeIdFromDB = async (recipeId: string) => {
-  const comments = await Comment.find({ recipe: recipeId });
+  const comments = await Comment.find({ recipe: recipeId })
+    .sort({
+      createdAt: -1,
+    })
+    .populate("user", "userName email profileImage _id");
   return comments;
 };
 
