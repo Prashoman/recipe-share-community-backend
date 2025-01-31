@@ -97,6 +97,17 @@ const getSingleRecipesById = catchAsyn(async (req, res) => {
   });
 });
 
+const getRecipesByUserId = catchAsyn(async (req, res) => {
+  const userId = req.params.userId;
+  const recipes = await RecipeService.getRecipesByUserIdFromDB(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipes,
+    message: "All recipes fetched successfully",
+  });
+});
+
 export const RecipeController = {
   createRecipe,
   getAllAdminRecipes,
@@ -106,4 +117,5 @@ export const RecipeController = {
   updateRecipe,
   getAllPublicRecipes,
   getSingleRecipesById,
+  getRecipesByUserId
 };

@@ -24,6 +24,8 @@ route.put("/update/:id", auth("admin","user"), RecipeController.updateRecipe);
 route.get("/get-all/public", RecipeController.getAllPublicRecipes);
 route.get("/details/:id", RecipeController.getSingleRecipesById);
 
+route.get("/:userId", auth("admin","user"), RecipeController.getRecipesByUserId);
+
 
 
 export const RecipeRouter = route;

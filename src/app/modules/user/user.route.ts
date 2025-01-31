@@ -40,4 +40,6 @@ route.post("/forget-password", UserController.forgetPassword);
 
 route.post("/reset-password", UserController.resetPassword);
 
+route.get("/user/:id", auth("admin","user"), UserController.getUserById);
+
 export const UserRoute = route;

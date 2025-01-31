@@ -7,23 +7,26 @@ import jwt from "jsonwebtoken";
 import config from "../../config";
 import createToken from "../../../utils/createToken";
 import { sendEmail } from "./user.constant";
+import { UserRelationShip } from "../userRelationShip/userRelationShip.model";
 
 const signUpIntoDB = async (payload: TUser) => {
   const existEmail = await User.findOne({ email: payload.email });
   if (existEmail) {
     throw new AppError(httpStatus.FORBIDDEN, "Email already exist");
   }
-  payload.bio="";
-  payload.address="";
+  payload.bio = "";
+  payload.address = "";
   payload.role = "user";
-
   // console.log(payload);
   const result = await User.create(payload);
   return result;
 };
 
 const getAllUsersFormDB = async () => {
-  const result = await User.find();
+  const result = await User.find({
+    role: "user",
+    isDeleted: false
+  }).sort({ createdAt: -1 });
   return result;
 };
 
@@ -40,16 +43,18 @@ const createAdminIntoDB = async (payload: TUser) => {
 const useLoginFromDB = async (payload: TUserLogin) => {
   const { email, password } = payload;
   // console.log({ email, password });
-  
-  const user = await User.findOne({ email, isDeleted: false }).select("+password");
+
+  const user = await User.findOne({ email, isDeleted: false }).select(
+    "+password"
+  );
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "Email Not Found");
   }
   // console.log({ user });
-  
+
   const isMatch = await bcrypt.compare(password, user.password);
   // console.log({ isMatch });
-  
+
   if (!isMatch) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Password dose not match");
   }
@@ -75,7 +80,7 @@ const useLoginFromDB = async (payload: TUserLogin) => {
 };
 
 const getAllAdminIntoDB = async () => {
-  const result = await User.find({ role: "admin" });
+  const result = await User.find({ role: "admin", isDeleted: false }).sort({ createdAt: -1 });
   return result;
 };
 
@@ -84,7 +89,10 @@ const changePasswordIntoDB = async (
   oldPassword: string,
   newPassword: string
 ) => {
-  const userWithPassword = await User.findOne({ _id: user.id, isDeleted: false }).select("+password");
+  const userWithPassword = await User.findOne({
+    _id: user.id,
+    isDeleted: false,
+  }).select("+password");
   if (!userWithPassword) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -154,7 +162,7 @@ const resetPasswordIntoDB = async (
   }
   const jwtPayload: any = jwt.verify(token, config.jwt_token_secret as string);
   // console.log({ jwtPayload, user });
-  
+
   if (jwtPayload.id != user._id) {
     throw new AppError(httpStatus.UNAUTHORIZED, "User not authorized");
   }
@@ -175,6 +183,20 @@ const resetPasswordIntoDB = async (
   return updatePassword;
 };
 
+const getUserByIdFromDB = async (userId: string) => {
+  const matchUser = await User.findById({ _id: userId, isDeleted: false });
+  const followInfo = await UserRelationShip.find({
+    follower: userId,
+  }).populate("following", "name email");
+  const followerInfo = await UserRelationShip.find({
+    following: userId,
+  }).populate("follower", "name email");
+  if (!matchUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+  return {userInfo:matchUser, followInfo, followerInfo};
+};
+
 export const UserService = {
   signUpIntoDB,
   getAllUsersFormDB,
@@ -186,5 +208,6 @@ export const UserService = {
   getProfileFromDB,
   forgetPasswordIntoDB,
   resetPasswordIntoDB,
+  getUserByIdFromDB,
 };
 // http://localhost:3000/reset-password?id=67926cf7dfd7c8f43b1d9d54&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTI2Y2Y3ZGZkN2M4ZjQzYjFkOWQ1NCIsInVzZXJSb2xlIjoidXNlciIsImlhdCI6MTczNzY5ODAzMywiZXhwIjoxNzM3Njk4MzMzfQ.jDUicc8ek6p1i0RAGcZkL6Ps1NdLTeDXP3-j3hVnIPc"

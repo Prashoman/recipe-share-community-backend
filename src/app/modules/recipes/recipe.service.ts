@@ -101,7 +101,7 @@ const getAllPublicRecipesFromDB = async () => {
         $sort: {
           likes: -1,
         },
-      }
+      },
     ]);
 
     return recipesWithRatings;
@@ -112,8 +112,6 @@ const getAllPublicRecipesFromDB = async () => {
     );
   }
 };
-
-
 
 const getSingleRecipeByIdFromDB = async (recipeId: any) => {
   try {
@@ -144,8 +142,55 @@ const getSingleRecipeByIdFromDB = async (recipeId: any) => {
       },
     ]);
     // console.log({getSingleRecipeWithRatings});
-    
+
     return getSingleRecipeWithRatings;
+  } catch (error) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+};
+
+const getRecipesByUserIdFromDB = async (userId: any) => {
+  try {
+    const recipes = await Recipe.aggregate([
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(userId),
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "ratings",
+          localField: "_id",
+          foreignField: "recipe",
+          as: "ratings",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "recipe",
+          as: "comments",
+        },
+      },
+
+      {
+        $addFields: {
+          comments: { $size: "$comments" },
+          averageRating: { $avg: "$ratings.rating" },
+        },
+      },
+      {
+        $project: {
+          ratings: 0,
+        },
+      },
+    ]).sort({ createdAt: -1 });
+    return recipes;
   } catch (error) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -162,5 +207,6 @@ export const RecipeService = {
   deleteRecipeIntoDB,
   updateRecipeIntoDB,
   getAllPublicRecipesFromDB,
-  getSingleRecipeByIdFromDB
+  getSingleRecipeByIdFromDB,
+  getRecipesByUserIdFromDB,
 };
