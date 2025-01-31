@@ -6,11 +6,11 @@ import { UserRelationShipController } from "./userRelationShip.controller";
 
 const route = express.Router();
 
-route.post("/follow", auth("user"), UserRelationShipController.followUser)
-route.post("/un-follow", auth("user"), UserRelationShipController.unFollowUser);
-route.get("/followers", auth("user"), UserRelationShipController.getFollowers);
+route.post("/follow", auth("user","admin"), UserRelationShipController.followUser)
+route.post("/un-follow", auth("user","admin"), UserRelationShipController.unFollowUser);
+route.get("/followers", auth("user","admin"), UserRelationShipController.getFollowers);
 
-route.get("/following", auth("user"), UserRelationShipController.getFollowing);
+route.get("/following", auth("user","admin"), UserRelationShipController.getFollowing);
 
 
 export const UserRelationShip = route;

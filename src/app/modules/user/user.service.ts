@@ -8,6 +8,7 @@ import config from "../../config";
 import createToken from "../../../utils/createToken";
 import { sendEmail } from "./user.constant";
 import { UserRelationShip } from "../userRelationShip/userRelationShip.model";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const signUpIntoDB = async (payload: TUser) => {
   const existEmail = await User.findOne({ email: payload.email });
@@ -25,7 +26,7 @@ const signUpIntoDB = async (payload: TUser) => {
 const getAllUsersFormDB = async () => {
   const result = await User.find({
     role: "user",
-    isDeleted: false
+    isDeleted: false,
   }).sort({ createdAt: -1 });
   return result;
 };
@@ -80,7 +81,9 @@ const useLoginFromDB = async (payload: TUserLogin) => {
 };
 
 const getAllAdminIntoDB = async () => {
-  const result = await User.find({ role: "admin", isDeleted: false }).sort({ createdAt: -1 });
+  const result = await User.find({ role: "admin", isDeleted: false }).sort({
+    createdAt: -1,
+  });
   return result;
 };
 
@@ -194,7 +197,23 @@ const getUserByIdFromDB = async (userId: string) => {
   if (!matchUser) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
-  return {userInfo:matchUser, followInfo, followerInfo};
+  return { userInfo: matchUser, followInfo, followerInfo };
+};
+
+const getAllBothUserFromDB = async (query: any) => {
+  // console.log({ query });
+
+  const allUserQuery = new QueryBuilder(
+    User.find({ isDeleted: false }).select("userName email profileImage _id"),
+    query
+  )
+    .search(["userName", "email"])
+    .sort()
+    .paginate()
+    .filter();
+  const meta = await allUserQuery.countTotal();
+  const result = await allUserQuery.modelQuery;
+  return { meta, result };
 };
 
 export const UserService = {
@@ -209,5 +228,6 @@ export const UserService = {
   forgetPasswordIntoDB,
   resetPasswordIntoDB,
   getUserByIdFromDB,
+  getAllBothUserFromDB,
 };
 // http://localhost:3000/reset-password?id=67926cf7dfd7c8f43b1d9d54&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTI2Y2Y3ZGZkN2M4ZjQzYjFkOWQ1NCIsInVzZXJSb2xlIjoidXNlciIsImlhdCI6MTczNzY5ODAzMywiZXhwIjoxNzM3Njk4MzMzfQ.jDUicc8ek6p1i0RAGcZkL6Ps1NdLTeDXP3-j3hVnIPc"

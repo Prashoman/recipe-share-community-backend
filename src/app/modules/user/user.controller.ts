@@ -143,6 +143,16 @@ const getUserById = catchAsyn(async (req: Request, res: Response) => {
   });
 });
 
+const getAllBothUsers = catchAsyn(async (req: Request, res: Response) => {
+  
+  const user = await UserService.getAllBothUserFromDB(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: user,
+    message: "User fetched successfully",
+  });
+});
 export const UserController = {
   userSignUp,
   getAllUsers,
@@ -154,5 +164,6 @@ export const UserController = {
   getProfile,
   forgetPassword,
   resetPassword,
-  getUserById
+  getUserById,
+  getAllBothUsers
 };

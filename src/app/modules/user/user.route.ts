@@ -42,4 +42,6 @@ route.post("/reset-password", UserController.resetPassword);
 
 route.get("/user/:id", auth("admin","user"), UserController.getUserById);
 
+route.get("/users/both", auth("admin","user"), UserController.getAllBothUsers);
+
 export const UserRoute = route;

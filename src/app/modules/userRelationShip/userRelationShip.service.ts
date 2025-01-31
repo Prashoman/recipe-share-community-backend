@@ -25,7 +25,6 @@ const userUnFollowingDB = async (unFollowId: any, id: any) => {
     }
     const result = await UserRelationShip.findOneAndDelete({ follower: id, following: unFollowId });
     return result;
-
 }
 
 const getFollowersDB = async (id: any) => {
