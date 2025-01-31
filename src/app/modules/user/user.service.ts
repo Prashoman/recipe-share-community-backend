@@ -23,12 +23,18 @@ const signUpIntoDB = async (payload: TUser) => {
   return result;
 };
 
-const getAllUsersFormDB = async () => {
-  const result = await User.find({
-    role: "user",
-    isDeleted: false,
-  }).sort({ createdAt: -1 });
-  return result;
+const getAllUsersFormDB = async (query: any) => {
+  const allUserQuery = new QueryBuilder(
+    User.find({ role: "user", isDeleted: false }),
+    query
+  )
+    .search(["userName", "email"])
+    .sort()
+    .paginate()
+    .filter();
+  const meta = await allUserQuery.countTotal();
+  const result = await allUserQuery.modelQuery;
+  return { meta, result };
 };
 
 const createAdminIntoDB = async (payload: TUser) => {
@@ -80,11 +86,19 @@ const useLoginFromDB = async (payload: TUserLogin) => {
   };
 };
 
-const getAllAdminIntoDB = async () => {
-  const result = await User.find({ role: "admin", isDeleted: false }).sort({
-    createdAt: -1,
-  });
-  return result;
+const getAllAdminIntoDB = async (query:any) => {
+
+  const allAdminQuery = new QueryBuilder(
+    User.find({ role: "admin", isDeleted: false }),
+    query
+  )
+    .search(["userName", "email"])
+    .sort()
+    .paginate()
+    .filter();
+  const meta = await allAdminQuery.countTotal();
+  const result = await allAdminQuery.modelQuery;
+  return { meta, result };
 };
 
 const changePasswordIntoDB = async (

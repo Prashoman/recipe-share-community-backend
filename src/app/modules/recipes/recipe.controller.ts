@@ -16,7 +16,7 @@ const createRecipe = catchAsyn(async (req, res) => {
 });
 
 const getAllAdminRecipes = catchAsyn(async (req, res) => {
-  const recipes = await RecipeService.getAllRecipesAdminFromDB();
+  const recipes = await RecipeService.getAllRecipesAdminFromDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -77,7 +77,7 @@ const updateRecipe = catchAsyn(async (req, res) => {
 });
 
 const getAllPublicRecipes = catchAsyn(async (req, res) => {
-  const recipes = await RecipeService.getAllPublicRecipesFromDB();
+  const recipes = await RecipeService.getAllPublicRecipesFromDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

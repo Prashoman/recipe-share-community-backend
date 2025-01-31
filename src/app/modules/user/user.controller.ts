@@ -19,7 +19,7 @@ const userSignUp = catchAsyn(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsyn(async (req: Request, res: Response) => {
-  const allUsers = await UserService.getAllUsersFormDB();
+  const allUsers = await UserService.getAllUsersFormDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -59,7 +59,7 @@ const createAdmin = catchAsyn(async (req: Request, res: Response) => {
 });
 
 const getAllAdmin = catchAsyn(async (req: Request, res: Response) => {
-  const admins = await UserService.getAllAdminIntoDB();
+  const admins = await UserService.getAllAdminIntoDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

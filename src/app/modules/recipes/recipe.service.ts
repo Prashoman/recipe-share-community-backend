@@ -3,6 +3,7 @@ import AppError from "../../error/AppError";
 import { User } from "../user/user.model";
 import { Recipe } from "./recipe.model";
 import mongoose from "mongoose";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 const createRecipeIntoDB = async (recipe: any, user: any) => {
   const matchUser = await User.findById(user.id, { isDeleted: false });
@@ -14,12 +15,21 @@ const createRecipeIntoDB = async (recipe: any, user: any) => {
   return result;
 };
 
-const getAllRecipesAdminFromDB = async () => {
-  const recipes = await Recipe.find({ isDeleted: false }).populate(
-    "user",
-    "userName email profileImage _id"
-  );
-  return recipes;
+const getAllRecipesAdminFromDB = async (query: any) => {
+  const allRecipeQuery = new QueryBuilder(
+    Recipe.find({ isDeleted: false }).populate(
+      "user",
+      "userName email profileImage _id"
+    ),
+    query
+  )
+    .search(["title", "cookingTime"])
+    .sort()
+    .paginate()
+    .filter();
+  const meta = await allRecipeQuery.countTotal();
+  const result = await allRecipeQuery.modelQuery;
+  return { meta, result };
 };
 
 const getAllRecipesUserFromDB = async (user: any) => {
@@ -70,21 +80,46 @@ const updateRecipeIntoDB = async (recipeId: any, recipe: any, user: any) => {
   return result;
 };
 
-const getAllPublicRecipesFromDB = async () => {
+const getAllPublicRecipesFromDB = async (query: any) => {
   try {
+    const { searchTerm, page = 1, limit = 10 } = query;
+
     const recipesWithRatings = await Recipe.aggregate([
       {
         $match: {
           isDeleted: false,
           isPublished: true,
+          ...(searchTerm && {
+            $or: [
+              { title: { $regex: searchTerm, $options: "i" } },
+              { cookingTime: { $regex: searchTerm, $options: "i" } },
+              {
+                ingredients: {
+                  $elemMatch: {
+                    name: { $regex: searchTerm, $options: "i" },
+                  },
+                },
+              },
+              {
+                tags: { $in: [new RegExp(searchTerm, "i")] },
+              },
+              {
+                steps: {
+                  $elemMatch: {
+                    description: { $regex: searchTerm, $options: "i" },
+                  },
+                },
+              },
+            ],
+          }),
         },
       },
       {
         $lookup: {
-          from: "ratings", // Reference the ratings collection
-          localField: "_id", // Match the recipe _id in recipes
-          foreignField: "recipe", // Match the recipe field in ratings
-          as: "ratings", // Include all ratings for the recipe
+          from: "ratings",
+          localField: "_id",
+          foreignField: "recipe",
+          as: "ratings",
         },
       },
       {
@@ -101,6 +136,12 @@ const getAllPublicRecipesFromDB = async () => {
         $sort: {
           likes: -1,
         },
+      },
+      {
+        $limit: limit ? parseInt(limit) : 10,
+      },
+      {
+        $skip: page ? (parseInt(page) - 1) * 10 : 0,
       },
     ]);
 
