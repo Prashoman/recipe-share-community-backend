@@ -44,4 +44,6 @@ route.get("/user/:id", auth("admin","user"), UserController.getUserById);
 
 route.get("/users/both", auth("admin","user"), UserController.getAllBothUsers);
 
+route.delete("/user/:id", auth("admin"), UserController.deleteUser);
+
 export const UserRoute = route;

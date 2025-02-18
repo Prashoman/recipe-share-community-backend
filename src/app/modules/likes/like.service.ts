@@ -17,7 +17,13 @@ const likeCreateIntoDB = async (recipeId: string, userId: string) => {
   if (matchLike) {
     throw new AppError(httpStatus.BAD_REQUEST, "You already liked this recipe");
   }
+
   const result = await Like.create({ recipe: recipeId, user: userId });
+  await Recipe.findByIdAndUpdate(
+    recipeId,
+    { $push: { userLiked: userId } },
+    { new: true }
+  );
   await Recipe.findByIdAndUpdate(
     recipeId,
     { $inc: { likes: 1 } },
@@ -27,11 +33,11 @@ const likeCreateIntoDB = async (recipeId: string, userId: string) => {
 };
 
 const deleteLikeFromDB = async (recipeId: string, userId: string) => {
-    // console.log(recipeId, userId);
-    
+  // console.log(recipeId, userId);
+
   const matchLike = await Like.findOne({ recipe: recipeId, user: userId });
-//   console.log({ matchLike });
-  
+  //   console.log({ matchLike });
+
   if (!matchLike) {
     throw new AppError(httpStatus.NOT_FOUND, "Like not found");
   }
@@ -42,6 +48,11 @@ const deleteLikeFromDB = async (recipeId: string, userId: string) => {
     },
     { new: true }
   );
+  await Recipe.findByIdAndUpdate(
+    recipeId,
+    { $pull: { userLiked: userId } },
+    { new: true }
+  );
   const result = await Like.findOneAndDelete({
     recipe: recipeId,
     user: userId,
@@ -50,12 +61,12 @@ const deleteLikeFromDB = async (recipeId: string, userId: string) => {
 };
 
 const getLikesFromDB = async (userId: string) => {
-    const likes = await Like.find({ user: userId });
-    return likes;
-}
+  const likes = await Like.find({ user: userId });
+  return likes;
+};
 
 export const LikeService = {
   likeCreateIntoDB,
   deleteLikeFromDB,
-  getLikesFromDB
+  getLikesFromDB,
 };

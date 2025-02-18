@@ -6,6 +6,8 @@ import httpStatus from "http-status";
 
 const createLike = catchAsyn(async (req: Request, res: Response) => {
   const recipeId =req.body.recipeId;
+  
+
   const userId = req.user.id;
   console.log(recipeId, userId);
   

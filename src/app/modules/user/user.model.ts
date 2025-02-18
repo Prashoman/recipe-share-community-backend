@@ -26,6 +26,7 @@ const userSchema = new Schema<TUser>(
     expiryDate: { type: Date, required: false },
     passwordUpdate: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
+   
   },
   {
     timestamps: true,

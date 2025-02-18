@@ -230,6 +230,11 @@ const getAllBothUserFromDB = async (query: any) => {
   return { meta, result };
 };
 
+const deleteUserFromDB = async (userId: string) => {
+  const user = await User.findByIdAndUpdate( {_id:userId}, { isDeleted: true });
+  return user;
+}
+
 export const UserService = {
   signUpIntoDB,
   getAllUsersFormDB,
@@ -243,5 +248,6 @@ export const UserService = {
   resetPasswordIntoDB,
   getUserByIdFromDB,
   getAllBothUserFromDB,
+  deleteUserFromDB
 };
 // http://localhost:3000/reset-password?id=67926cf7dfd7c8f43b1d9d54&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OTI2Y2Y3ZGZkN2M4ZjQzYjFkOWQ1NCIsInVzZXJSb2xlIjoidXNlciIsImlhdCI6MTczNzY5ODAzMywiZXhwIjoxNzM3Njk4MzMzfQ.jDUicc8ek6p1i0RAGcZkL6Ps1NdLTeDXP3-j3hVnIPc"

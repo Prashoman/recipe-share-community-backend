@@ -153,6 +153,19 @@ const getAllBothUsers = catchAsyn(async (req: Request, res: Response) => {
     message: "User fetched successfully",
   });
 });
+
+const deleteUser = catchAsyn(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const user = await UserService.deleteUserFromDB(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: user,
+    message: "User deleted successfully",
+  });
+});
+
+
 export const UserController = {
   userSignUp,
   getAllUsers,
@@ -165,5 +178,6 @@ export const UserController = {
   forgetPassword,
   resetPassword,
   getUserById,
-  getAllBothUsers
+  getAllBothUsers,
+  deleteUser
 };

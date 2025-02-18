@@ -10,6 +10,10 @@ const createRecipeIntoDB = async (recipe: any, user: any) => {
   if (!matchUser) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
+  recipe.isPublished = false;
+  if (matchUser.role === "admin") {
+    recipe.isPublished = true;
+  }
   recipe.user = user.id;
   const result = await Recipe.create(recipe);
   return result;
@@ -23,7 +27,7 @@ const getAllRecipesAdminFromDB = async (query: any) => {
     ),
     query
   )
-    .search(["title", "cookingTime"])
+    .search(["title"])
     .sort()
     .paginate()
     .filter();
@@ -73,7 +77,12 @@ const updateRecipeIntoDB = async (recipeId: any, recipe: any, user: any) => {
   if (!recipeInfo) {
     throw new AppError(httpStatus.NOT_FOUND, "Recipe not found");
   }
-  recipe.user = user.id;
+  recipe.user = user?.id;
+  recipe.likes = recipeInfo?.likes;
+  recipe.isPublished = recipeInfo?.isPublished;
+  recipe.isDeleted = recipeInfo?.isDeleted;
+  recipe.isPremium = recipeInfo?.isPremium;
+  recipe.status = recipeInfo?.status;
   const result = await Recipe.findByIdAndUpdate(recipeId, recipe, {
     new: true,
   });
@@ -128,8 +137,53 @@ const getAllPublicRecipesFromDB = async (query: any) => {
         },
       },
       {
+        $lookup: {
+          from: "users", // Collection name
+          localField: "user", // The field in the Recipe collection that references the User
+          foreignField: "_id", // The _id field in the Users collection
+          as: "user", // The result will be stored in a "user" array
+        },
+      },
+      {
+        $lookup: {
+          from: "categories", // Collection name
+          localField: "category", // The field in the Recipe collection that references the User
+          foreignField: "_id", // The _id field in the Users collection
+          as: "category", // The result will be stored in a "user" array
+        },
+      },
+      {
+        $unwind: "$category", // Converts category array into an object
+      },
+      {
+        $unwind: {
+          path: "$user", // Unwind the array to get a single object
+          preserveNullAndEmptyArrays: true, // In case the user field is null
+        },
+      },
+      {
         $project: {
-          ratings: 0,
+          "category.__v": 0,
+          "category.createdAt": 0,
+          "category.updatedAt": 0,
+          "category.isDeleted": 0,
+          "category.categoryDescription": 0,
+        },
+      },
+      {
+        $project: {
+          ratings: 0, // Remove the raw ratings array
+          "user.password": 0, // Exclude sensitive fields from user
+          "user.__v": 0,
+          "user.address": 0,
+          "user.bio": 0,
+          "user.createdAt": 0,
+          "user.expiryDate": 0,
+          "user.isDeleted": 0,
+          "user.memberShip": 0,
+          "user.passwordUpdate": 0,
+          "user.role": 0,
+          "user.updatedAt": 0,
         },
       },
       {
@@ -179,6 +233,56 @@ const getSingleRecipeByIdFromDB = async (recipeId: any) => {
       {
         $project: {
           ratings: 0,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories", // Collection name
+          localField: "category", // The field in the Recipe collection that references the User
+          foreignField: "_id", // The _id field in the Users collection
+          as: "category", // The result will be stored in a "user" array
+        },
+      },
+      {
+        $unwind: "$category", // Converts category array into an object
+      },
+      {
+        $project: {
+          "category.__v": 0,
+          "category.createdAt": 0,
+          "category.updatedAt": 0,
+          "category.isDeleted": 0,
+          "category.categoryDescription": 0,
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // Collection name
+          localField: "user", // The field in the Recipe collection that references the User
+          foreignField: "_id", // The _id field in the Users collection
+          as: "user", // The result will be stored in a "user" array
+        },
+      },
+      {
+        $unwind: {
+          path: "$user", // Unwind the array to get a single object
+          preserveNullAndEmptyArrays: true, // In case the user field is null
+        },
+      },
+      {
+        $project: {
+          ratings: 0, // Remove the raw ratings array
+          "user.password": 0, // Exclude sensitive fields from user
+          "user.__v": 0,
+          "user.address": 0,
+          "user.bio": 0,
+          "user.createdAt": 0,
+          "user.expiryDate": 0,
+          "user.isDeleted": 0,
+          "user.memberShip": 0,
+          "user.passwordUpdate": 0,
+          "user.role": 0,
+          "user.updatedAt": 0,
         },
       },
     ]);
@@ -240,6 +344,32 @@ const getRecipesByUserIdFromDB = async (userId: any) => {
   }
 };
 
+const getAllUnPublishRecipesFromDB = async (query: any) => {
+  const allRecipeQuery = new QueryBuilder(
+    Recipe.find({ isDeleted: false, isPublished: false })
+      .populate("user", "userName email profileImage _id")
+      .populate("category", "categoryName _id"),
+    query
+  )
+    .search(["title"])
+    .sort()
+    .paginate()
+    .filter();
+  const meta = await allRecipeQuery.countTotal();
+  const result = await allRecipeQuery.modelQuery;
+
+  return { meta, result };
+};
+
+const getLatestRecipesFromDB = async () => {
+  const recipes = await Recipe.find({ isDeleted: false, isPublished: true })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .populate("user", "userName email profileImage _id")
+    .populate("category", "categoryName _id");
+  return recipes;
+};
+
 export const RecipeService = {
   createRecipeIntoDB,
   getAllRecipesAdminFromDB,
@@ -250,4 +380,6 @@ export const RecipeService = {
   getAllPublicRecipesFromDB,
   getSingleRecipeByIdFromDB,
   getRecipesByUserIdFromDB,
+  getAllUnPublishRecipesFromDB,
+  getLatestRecipesFromDB,
 };

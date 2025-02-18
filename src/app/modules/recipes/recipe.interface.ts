@@ -11,7 +11,8 @@ export type TRecipe = {
     isPublished: boolean;
     isPremium: boolean;
     isDeleted: boolean;
-    category: string;
+    category: Types.ObjectId;
     tags: string[];
     status: boolean;
+    userLiked: Types.ObjectId[];
 }

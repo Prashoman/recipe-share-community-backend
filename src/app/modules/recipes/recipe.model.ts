@@ -13,16 +13,14 @@ const recipeModel = new Schema<TRecipe>(
     isPublished: { type: Boolean, default: false },
     isPremium: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
-    category: { type: String, required: true },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     tags: [{ type: String, required: true }],
     status: { type: Boolean, default: true },
+    userLiked: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
   },
   {
     timestamps: true,
   }
 );
 
-export const Recipe = model<TRecipe>(
-  "Recipe",
-  recipeModel
-);
+export const Recipe = model<TRecipe>("Recipe", recipeModel);

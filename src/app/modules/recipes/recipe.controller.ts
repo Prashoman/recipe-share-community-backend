@@ -108,6 +108,27 @@ const getRecipesByUserId = catchAsyn(async (req, res) => {
   });
 });
 
+const getAllUnPublishRecipes = catchAsyn(async (req, res) => {
+
+  const recipes = await RecipeService.getAllUnPublishRecipesFromDB(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipes,
+    message: "All unpublished recipes fetched successfully",
+  });
+});
+
+const getLatestRecipes = catchAsyn(async (req, res) => {
+  const recipes = await RecipeService.getLatestRecipesFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipes,
+    message: "All latest recipes fetched successfully",
+  });
+});
+
 export const RecipeController = {
   createRecipe,
   getAllAdminRecipes,
@@ -117,5 +138,7 @@ export const RecipeController = {
   updateRecipe,
   getAllPublicRecipes,
   getSingleRecipesById,
-  getRecipesByUserId
+  getRecipesByUserId,
+  getAllUnPublishRecipes,
+  getLatestRecipes
 };
