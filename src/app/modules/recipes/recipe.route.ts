@@ -36,6 +36,7 @@ route.put("/update/:id", auth("admin", "user"), RecipeController.updateRecipe);
 route.get("/get-all/public", RecipeController.getAllPublicRecipes);
 route.get("/get-all/unPublish", auth("admin"), RecipeController.getAllUnPublishRecipes);
 route.get("/details/:id", RecipeController.getSingleRecipesById);
+route.get("/trending/recipes", RecipeController.getTrendingRecipes);
 
 route.get(
   "/:userId",

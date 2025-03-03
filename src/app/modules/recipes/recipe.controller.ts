@@ -129,6 +129,17 @@ const getLatestRecipes = catchAsyn(async (req, res) => {
   });
 });
 
+const getTrendingRecipes = catchAsyn(async (req, res) => {
+  const recipes = await RecipeService.getTrendingRecipesFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    data: recipes,
+    message: "All trending recipes fetched successfully",
+  });
+}
+)
+
 export const RecipeController = {
   createRecipe,
   getAllAdminRecipes,
@@ -140,5 +151,6 @@ export const RecipeController = {
   getSingleRecipesById,
   getRecipesByUserId,
   getAllUnPublishRecipes,
-  getLatestRecipes
+  getLatestRecipes,
+  getTrendingRecipes
 };

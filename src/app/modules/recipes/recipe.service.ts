@@ -153,6 +153,19 @@ const getAllPublicRecipesFromDB = async (query: any) => {
         },
       },
       {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "recipe",
+          as: "comments",
+        },
+      },
+      {
+        $addFields: {
+          comments: { $size: "$comments" },
+        },
+      },
+      {
         $unwind: "$category", // Converts category array into an object
       },
       {
@@ -370,6 +383,15 @@ const getLatestRecipesFromDB = async () => {
   return recipes;
 };
 
+const getTrendingRecipesFromDB = async () => {
+  const recipes = await Recipe.find({ isDeleted: false, isPublished: true, isPremium: false })
+    .sort({ likes: -1 })
+    .limit(10)
+    .populate("user", "userName email profileImage _id")
+    .populate("category", "categoryName _id");
+  return recipes;
+}
+
 export const RecipeService = {
   createRecipeIntoDB,
   getAllRecipesAdminFromDB,
@@ -382,4 +404,5 @@ export const RecipeService = {
   getRecipesByUserIdFromDB,
   getAllUnPublishRecipesFromDB,
   getLatestRecipesFromDB,
+  getTrendingRecipesFromDB
 };
